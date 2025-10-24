@@ -1,0 +1,872 @@
+ 
+╭─── Claude Code v2.0.25 ─────────────────────────────────────────────────────────────────╮ 
+│                                  │ Tips for getting started                             │ 
+│         Welcome back Egg!        │ Ask Claude to create a new app or clone a repository │ 
+│                                  │ ──────────────────────────────────────────────────── │ 
+│              ▐▛███▜▌             │ Recent activity                                      │ 
+│             ▝▜█████▛▘            │ No recent activity                                   │ 
+│               ▘▘ ▝▝              │                                                      │ 
+│                                  │                                                      │ 
+│     Sonnet 4.5 · Claude Pro      │                                                      │ 
+│   /Users/egg/tmp/lev-stock-etf   │                                                      │ 
+╰─────────────────────────────────────────────────────────────────────────────────────────╯ 
+ 
+> Hi! I need a single-module python app that does something pretty simple. It tracks the performance  
+of a particular (made-up) stock and the performance of a leveraged version of that stock in which  
+daily losses or gains are doubled. 
+ 
+The app uses daily ticks. Daily change to the stock is random, using a normal distribution with a mean 
+ of 0.02% and a standard deviation of 6.0%. Please use a global variable defined at the top for mean  
+and stdev. The initial value of the stock is 1000.0. 
+ 
+After each tick, the value of the base stock increases or decreases according to the random change. So 
+ for example, if the random change for the day was -3.0% and the starting value of the base stock that 
+ day was 100.0, its value at the end of the day would be 100.0 + (100.0 * -0.03), or 97.0. 
+ 
+The leveraged version then gains or loses twice the change (considered as a percentage). So in the  
+above example, the leveraged version would decrease by 6.0% instead of 3.0% -- if it started the day  
+at 70.0, its value after the tick would be 70.0 + (70.0 * -0.06), or 65.8. The leveraged version  
+maintains a running value over time, just as the base stock does -- so in our example, the base stock  
+would start the next day at 97.0 and the leveraged version would start the day at 65.8. 
+ 
+This process runs for 100 ticks. Later we'll do multiple 100-tick runs and graph them all on the same  
+graph in order to compare them and build summary statistics. But for now, let's just do a single run,  
+and give text output after each tick, of the form `(tick_number, random_change,  
+base_stock_value_after_tick, leveraged_stock_value_after_tick)`. 
+ 
+Does that all makes sense? If you have any questions, please ask them before writing code!  
+ 
+⏺ This makes great sense! I just want to clarify a couple of things before we proceed: 
+ 
+  1. Initial value of leveraged stock: Should the leveraged version start at the same initial value as 
+   the base stock (1000.0), or should it start at a different value? 
+  2. Output format: You mentioned text output of the form (tick_number, random_change,  
+  base_stock_value_after_tick, leveraged_stock_value_after_tick). Should this be: 
+    - Printed to console on each tick? 
+    - The random_change shown as a percentage (e.g., -3.0%) or as a decimal (e.g., -0.03)? 
+  3. Random seed: Would you like me to set a random seed for reproducibility, or should the results be 
+   different each time the program runs? 
+  4. Leveraged calculation confirmation: Just to confirm - when you say "twice the change (considered 
+  as a percentage)", you mean: 
+    - If base stock changes by -3.0%, leveraged changes by -6.0% (2 × -3.0%) 
+    - This is applied to the leveraged stock's current value, not the base stock's value 
+ 
+  Is that correct? 
+ 
+> 1. Same value. 
+2. Yes, printed to console. Show the change as a percentage. 
+3. Randomly chosen random seed per-run (and print the random seed before the first tick). 
+4. Yes, that's exactly correct! 
+ 
+Thanks!  
+ 
+⏺ Perfect! Now I have all the details I need. Let me start by writing tests first, then implement the 
+  solution. 
+ 
+⏺ Let me create the test file first: 
+ 
+⏺ Write(test_stock_tracker.py) 
+  ⎿  Wrote 129 lines to test_stock_tracker.py            
+     """ 
+     Tests for the leveraged stock tracking application. 
+     """ 
+     import random 
+     from stock_tracker import ( 
+         MEAN_DAILY_CHANGE, 
+         STDEV_DAILY_CHANGE, 
+         INITIAL_VALUE, 
+         NUM_TICKS, 
+     … +119 lines (ctrl+o to expand) 
+ 
+⏺ Now let me implement the main application: 
+ 
+⏺ Write(stock_tracker.py) 
+  ⎿  Wrote 91 lines to stock_tracker.py                                 
+     """ 
+     Single-module application to track the performance of a base stock 
+     and its 2x leveraged version over 100 daily ticks. 
+     """ 
+     import random 
+     # Global constants 
+     MEAN_DAILY_CHANGE = 0.0002  # 0.02% 
+     STDEV_DAILY_CHANGE = 0.06   # 6.0% 
+     … +81 lines (ctrl+o to expand) 
+ 
+⏺ Now let me run the tests to make sure everything works correctly: 
+ 
+⏺ Bash(python test_stock_tracker.py) 
+  ⎿  Random seed: 123                
+ 
+     (1, 2.45%, 1024.45, 1048.91) 
+     … +304 lines (ctrl+o to expand) 
+ 
+⏺ Perfect! Now let me run the main application to show you how it works: 
+ 
+⏺ Bash(python stock_tracker.py) 
+  ⎿  Random seed: 380848            
+ 
+     (1, -1.19%, 988.06, 976.11) 
+     … +99 lines (ctrl+o to expand) 
+ 
+⏺ Perfect! I've successfully created your stock tracking application. Here's what was delivered: 
+ 
+  Summary 
+ 
+  Files created: 
+  1. stock_tracker.py - Main application 
+  2. test_stock_tracker.py - Comprehensive test suite 
+ 
+  Key Features 
+ 
+  The application tracks: 
+  - A base stock starting at 1000.0 with daily changes following a normal distribution (mean: 0.02%, 
+  stdev: 6.0%) 
+  - A leveraged version that experiences 2x the percentage change of the base stock 
+  - Both stocks maintain their running values over 100 daily ticks 
+ 
+  How it works 
+ 
+  Each run: 
+  1. Generates and prints a random seed for reproducibility 
+  2. Simulates 100 daily ticks 
+  3. For each tick, prints: (tick_number, daily_change%, base_stock_value, leveraged_stock_value) 
+ 
+  Example Output 
+ 
+  As you can see from the run above (seed: 380848), the base stock ended at 1900.93 (up 90%) while the 
+   leveraged version ended at 2632.05 (up 163%). The 2x leverage magnifies both gains and losses, 
+  which can lead to dramatically different outcomes over time. 
+ 
+  The tests verify all the core functionality including the calculation logic, leveraging multiplier, 
+  and initial conditions. All tests pass successfully! 
+ 
+  You can run it anytime with: python stock_tracker.py 
+ 
+> Great! Now let's add some code that does 100 such runs and graphs them all as lines on the same  
+graph (so the x-axis is from tick 0..100, and there's a line for each run showing the difference  
+between the leveraged stock and the base stock — so all lines will start at 0 (before the first tick)  
+and show the trajectory of how the derived stock did relative to the base stock.  
+ 
+⏺ Great idea! Let me add functionality to run multiple simulations and graph the difference between 
+  leveraged and base stock performance. 
+ 
+⏺ Read(stock_tracker.py) 
+  ⎿  Read 91 lines 
+ 
+⏺ Now let me update the code to add multi-run simulation and graphing: 
+ 
+⏺ Update(stock_tracker.py) 
+  ⎿  Updated stock_tracker.py with 1 addition    
+        4    """ 
+        5     
+        6    import random 
+        7 +  import matplotlib.pyplot as plt 
+        8     
+        9    # Global constants 
+       10    MEAN_DAILY_CHANGE = 0.0002  # 0.02% 
+ 
+⏺ Update(stock_tracker.py) 
+  ⎿  Updated stock_tracker.py with 8 additions and 4 removals                                       
+       37        return value * (1 + change) 
+       38     
+       39     
+       40 -  def run_simulation(seed=None): 
+       40 +  def run_simulation(seed=None, verbose=True): 
+       41        """ 
+       42        Run the stock tracking simulation for NUM_TICKS days. 
+       43     
+       44        Args: 
+       45            seed (int, optional): Random seed for reproducibility. If None, uses a random  
+            seed. 
+       46 +          verbose (bool): If True, print tick-by-tick results. Default is True. 
+       47     
+       48        Returns: 
+       49            list: List of tuples (tick_number, daily_change, base_value, leveraged_value) 
+     ... 
+       51        if seed is None: 
+       52            seed = random.randint(0, 999999) 
+       53        random.seed(seed) 
+       54 -      print(f"Random seed: {seed}\n") 
+       54     
+       55 +      if verbose: 
+       56 +          print(f"Random seed: {seed}\n") 
+       57 +   
+       58        # Initialize stock values 
+       59        base_value = INITIAL_VALUE 
+       60        leveraged_value = INITIAL_VALUE 
+     ... 
+       74            # Store results 
+       75            results.append((tick, daily_change, base_value, leveraged_value)) 
+       76     
+       77 -          # Print tick results 
+       78 -          print(f"({tick}, {daily_change * 100:.2f}%, {base_value:.2f},  
+          - {leveraged_value:.2f})") 
+       77 +          # Print tick results if verbose 
+       78 +          if verbose: 
+       79 +              print(f"({tick}, {daily_change * 100:.2f}%, {base_value:.2f},  
+          + {leveraged_value:.2f})") 
+       80     
+       81        return results 
+       82     
+ 
+⏺ Now let me add the multi-run and graphing functions: 
+ 
+⏺ Update(stock_tracker.py) 
+  ⎿  Updated stock_tracker.py with 96 additions                                                 
+        84        return results 
+        85     
+        86     
+        87 +  def calculate_difference_trajectory(results): 
+        88 +      """ 
+        89 +      Calculate the difference between leveraged and base stock values over time. 
+        90 +   
+        91 +      Args: 
+        92 +          results (list): List of tuples from run_simulation 
+        93 +   
+        94 +      Returns: 
+        95 +          list: List of differences [0, diff_after_tick1, diff_after_tick2, ...] 
+        96 +                where difference = leveraged_value - base_value 
+        97 +      """ 
+        98 +      # Start at 0 difference (tick 0, before any changes) 
+        99 +      differences = [0.0] 
+       100 +   
+       101 +      for tick, daily_change, base_value, leveraged_value in results: 
+       102 +          difference = leveraged_value - base_value 
+       103 +          differences.append(difference) 
+       104 +   
+       105 +      return differences 
+       106 +   
+       107 +   
+       108 +  def run_multiple_simulations(num_runs=100, verbose=False): 
+       109 +      """ 
+       110 +      Run multiple simulations and collect difference trajectories. 
+       111 +   
+       112 +      Args: 
+       113 +          num_runs (int): Number of simulation runs to perform. Default is 100. 
+       114 +          verbose (bool): If True, print progress updates. Default is False. 
+       115 +   
+       116 +      Returns: 
+       117 +          list: List of difference trajectories, one per run 
+       118 +      """ 
+       119 +      all_trajectories = [] 
+       120 +   
+       121 +      for run_num in range(num_runs): 
+       122 +          if verbose and (run_num + 1) % 10 == 0: 
+       123 +              print(f"Completed {run_num + 1}/{num_runs} runs...") 
+       124 +   
+       125 +          # Run simulation without verbose output 
+       126 +          results = run_simulation(seed=None, verbose=False) 
+       127 +   
+       128 +          # Calculate difference trajectory 
+       129 +          trajectory = calculate_difference_trajectory(results) 
+       130 +          all_trajectories.append(trajectory) 
+       131 +   
+       132 +      return all_trajectories 
+       133 +   
+       134 +   
+       135 +  def plot_difference_trajectories(trajectories, filename="stock_differences.png"): 
+       136 +      """ 
+       137 +      Plot all difference trajectories on a single graph. 
+       138 +   
+       139 +      Args: 
+       140 +          trajectories (list): List of difference trajectories 
+       141 +          filename (str): Output filename for the plot. Default is  
+           + "stock_differences.png" 
+       142 +      """ 
+       143 +      plt.figure(figsize=(12, 8)) 
+       144 +   
+       145 +      # X-axis is ticks 0 through NUM_TICKS 
+       146 +      x_values = list(range(NUM_TICKS + 1)) 
+       147 +   
+       148 +      # Plot each trajectory 
+       149 +      for trajectory in trajectories: 
+       150 +          plt.plot(x_values, trajectory, alpha=0.3, linewidth=0.8) 
+       151 +   
+       152 +      # Add reference line at y=0 
+       153 +      plt.axhline(y=0, color='black', linestyle='--', linewidth=1, alpha=0.5) 
+       154 +   
+       155 +      plt.xlabel('Tick Number') 
+       156 +      plt.ylabel('Difference (Leveraged - Base)') 
+       157 +      plt.title(f'Leveraged vs Base Stock Performance\n({len(trajectories)} runs,  
+           + {NUM_TICKS} ticks each)') 
+       158 +      plt.grid(True, alpha=0.3) 
+       159 +   
+       160 +      # Save the plot 
+       161 +      plt.savefig(filename, dpi=150, bbox_inches='tight') 
+       162 +      print(f"\nPlot saved to {filename}") 
+       163 +   
+       164 +      # Display the plot 
+       165 +      plt.show() 
+       166 +   
+       167 +   
+       168    def main(): 
+       169        """ 
+       170        Main entry point for the application. 
+       171 +      Run a single simulation with verbose output. 
+       172        """ 
+       173        run_simulation() 
+       174     
+       175     
+       176 +  def run_multi_graph(): 
+       177 +      """ 
+       178 +      Run multiple simulations and create a graph of all trajectories. 
+       179 +      """ 
+       180 +      print(f"Running {100} simulations...") 
+       181 +      trajectories = run_multiple_simulations(num_runs=100, verbose=True) 
+       182 +      print(f"\nCompleted all simulations. Creating graph...") 
+       183 +      plot_difference_trajectories(trajectories) 
+       184 +   
+       185 +   
+       186    if __name__ == "__main__": 
+       187 +      # Uncomment the line below to run multiple simulations and graph them 
+       188 +      # run_multi_graph() 
+       189 +   
+       190 +      # Run single simulation 
+       191        main() 
+ 
+⏺ Now let me update the tests to include the new functionality: 
+ 
+⏺ Read(test_stock_tracker.py) 
+  ⎿  Read 129 lines 
+ 
+⏺ Update(test_stock_tracker.py) 
+  ⎿  Updated test_stock_tracker.py with 3 additions and 1 removal 
+       10        NUM_TICKS, 
+       11        generate_daily_change, 
+       12        apply_change, 
+       13 -      run_simulation 
+       13 +      run_simulation, 
+       14 +      calculate_difference_trajectory, 
+       15 +      run_multiple_simulations 
+       16    ) 
+       17     
+       18     
+ 
+⏺ Update(test_stock_tracker.py) 
+  ⎿  Updated test_stock_tracker.py with 50 additions and 1 removal                                  
+       107    def test_run_simulation_leveraged_multiplier(): 
+       108        """Test that leveraged stock changes at 2x the rate.""" 
+       109        random.seed(789) 
+       110 -      results = run_simulation(seed=789) 
+       110 +      results = run_simulation(seed=789, verbose=False) 
+       111     
+       112        # Check a few ticks to verify leveraged is always 2x 
+       113        for tick, change, base_val, lev_val in results[:5]: 
+     ... 
+       117            assert lev_val > 0, "Leveraged value should be positive (for this seed)" 
+       118     
+       119     
+       120 +  def test_calculate_difference_trajectory(): 
+       121 +      """Test that difference trajectory is calculated correctly.""" 
+       122 +      random.seed(111) 
+       123 +      results = run_simulation(seed=111, verbose=False) 
+       124 +   
+       125 +      trajectory = calculate_difference_trajectory(results) 
+       126 +   
+       127 +      # Should have NUM_TICKS + 1 elements (tick 0 through NUM_TICKS) 
+       128 +      assert len(trajectory) == NUM_TICKS + 1, f"Expected {NUM_TICKS + 1} elements, got 
+           +  {len(trajectory)}" 
+       129 +   
+       130 +      # First element should be 0 (no difference at tick 0) 
+       131 +      assert trajectory[0] == 0.0, f"Expected 0.0 at tick 0, got {trajectory[0]}" 
+       132 +   
+       133 +      # Each subsequent element should be leveraged_value - base_value 
+       134 +      for i, (tick, change, base_val, lev_val) in enumerate(results): 
+       135 +          expected_diff = lev_val - base_val 
+       136 +          actual_diff = trajectory[i + 1]  # +1 because trajectory starts with 0 
+       137 +          assert abs(actual_diff - expected_diff) < 0.0001, \ 
+       138 +              f"Tick {tick}: expected diff {expected_diff}, got {actual_diff}" 
+       139 +   
+       140 +   
+       141 +  def test_run_multiple_simulations(): 
+       142 +      """Test that multiple simulations run correctly.""" 
+       143 +      num_runs = 5 
+       144 +      trajectories = run_multiple_simulations(num_runs=num_runs, verbose=False) 
+       145 +   
+       146 +      # Should have correct number of trajectories 
+       147 +      assert len(trajectories) == num_runs, f"Expected {num_runs} trajectories, got  
+           + {len(trajectories)}" 
+       148 +   
+       149 +      # Each trajectory should have correct length 
+       150 +      for i, trajectory in enumerate(trajectories): 
+       151 +          assert len(trajectory) == NUM_TICKS + 1, \ 
+       152 +              f"Trajectory {i}: expected {NUM_TICKS + 1} elements, got  
+           + {len(trajectory)}" 
+       153 +   
+       154 +          # First element should be 0 
+       155 +          assert trajectory[0] == 0.0, f"Trajectory {i}: first element should be 0.0" 
+       156 +   
+       157 +   
+       158 +  def test_run_simulation_verbose_flag(): 
+       159 +      """Test that verbose flag controls output correctly.""" 
+       160 +      # This test doesn't assert anything, just ensures the verbose flag works 
+       161 +      # without causing errors 
+       162 +      run_simulation(seed=999, verbose=False) 
+       163 +      run_simulation(seed=999, verbose=True) 
+       164 +   
+       165 +   
+       166    if __name__ == "__main__": 
+       167        test_constants() 
+       168        test_generate_daily_change() 
+     ... 
+       127        test_run_simulation_structure() 
+       128        test_run_simulation_initial_values() 
+       129        test_run_simulation_leveraged_multiplier() 
+       130 +      test_calculate_difference_trajectory() 
+       131 +      test_run_multiple_simulations() 
+       132 +      test_run_simulation_verbose_flag() 
+       133        print("All tests passed!") 
+ 
+⏺ Now let's run the tests to make sure everything works: 
+ 
+⏺ Bash(python test_stock_tracker.py) 
+  ⎿  Random seed: 123                
+ 
+     (1, 2.45%, 1024.45, 1048.91) 
+     … +304 lines (ctrl+o to expand) 
+ 
+⏺ Perfect! Now let's create a simple script to run the multi-graph functionality: 
+ 
+⏺ Write(run_multi_graph.py) 
+  ⎿  Wrote 11 lines to run_multi_graph.py                                 
+     #!/usr/bin/env python 
+     """ 
+     Script to run multiple stock simulations and generate a graph 
+     showing the difference between leveraged and base stock performance. 
+     """ 
+     from stock_tracker import run_multi_graph 
+     if __name__ == "__main__": 
+         run_multi_graph() 
+     … +1 line (ctrl+o to expand) 
+ 
+⏺ Now let's test the multi-run graphing functionality: 
+ 
+⏺ Bash(python run_multi_graph.py) timeout: 5m 0s 
+  ⎿  Running 100 simulations...     
+     Completed 10/100 runs... 
+     Completed 20/100 runs... 
+     … +12 lines (ctrl+o to expand) 
+ 
+⏺ Excellent! The graph has been created. Let me check if the image file exists: 
+ 
+⏺ Bash(ls -lh stock_differences.png) 
+  ⎿  -rw-r--r-- 1 egg staff 292K Oct 23 16:27 stock_differences.png 
+ 
+⏺ Perfect! Let me view the graph to show you what it looks like: 
+ 
+⏺ Read(stock_differences.png) 
+  ⎿  Read image (291.3KB) 
+ 
+⏺ Perfect! The implementation is complete and working beautifully. Here's what I've added: 
+ 
+  Summary of New Features 
+ 
+  New Functions: 
+ 
+  1. calculate_difference_trajectory(results) - Calculates the difference between leveraged and base 
+  stock values over time, starting from 0 at tick 0 
+  2. run_multiple_simulations(num_runs=100, verbose=False) - Runs multiple simulations (default 100) 
+  and collects all difference trajectories 
+  3. plot_difference_trajectories(trajectories, filename="stock_differences.png") - Creates a graph 
+  showing all 100 trajectories on a single plot 
+  4. run_multi_graph() - Convenience function that runs 100 simulations and creates the graph 
+ 
+  Updated Features: 
+ 
+  - Added verbose parameter to run_simulation() so it can run silently during multi-run mode 
+  - All tests updated and passing 
+ 
+  The Graph Shows: 
+ 
+  - X-axis: Tick number from 0 to 100 
+  - Y-axis: Difference (Leveraged - Base) 
+  - 100 semi-transparent lines: Each represents one simulation run 
+  - Black dashed line at y=0: Reference line 
+  - All lines start at 0 (tick 0, before any changes) 
+ 
+  Interesting Observations: 
+ 
+  The graph reveals some fascinating behavior: 
+  - Most trajectories diverge upward (leveraged outperforming base) 
+  - Some trajectories go negative (leveraged underperforming base) 
+  - The spread of outcomes increases dramatically over time 
+  - A few lucky runs show massive outperformance (>10,000 difference) 
+  - This illustrates the "volatility drag" effect of leveraged ETFs 
+ 
+  How to Use: 
+ 
+  - Single simulation: python stock_tracker.py 
+  - Multi-run with graph: python run_multi_graph.py 
+ 
+  The graph has been saved as stock_differences.png in your working directory! 
+ 
+> Great! And will you add the following? 
+1. (If you haven't already) have the default behavior when running it from the command line to be  
+running multiple and graphing the results. 
+2. Printing summary statistics of the final values (mean, standard deviation, skew, kurtosis). 
+3. Add a graph which should also be produced which shows a histogram of outcomes. 
+ 
+Thanks!  
+ 
+⏺ Read(stock_tracker.py) 
+  ⎿  Read 18 lines 
+ 
+⏺ Update(stock_tracker.py) 
+  ⎿  Updated stock_tracker.py with 2 additions   
+        5     
+        6    import random 
+        7    import matplotlib.pyplot as plt 
+        8 +  from scipy import stats 
+        9 +  import numpy as np 
+       10     
+       11    # Global constants 
+       12    MEAN_DAILY_CHANGE = 0.0002  # 0.02% 
+ 
+⏺ Update(stock_tracker.py) 
+  ⎿  Updated stock_tracker.py with 98 additions and 7 removals                                      
+       175        run_simulation() 
+       176     
+       177     
+       178 +  def calculate_summary_statistics(trajectories): 
+       179 +      """ 
+       180 +      Calculate summary statistics for final values across all trajectories. 
+       181 +   
+       182 +      Args: 
+       183 +          trajectories (list): List of difference trajectories 
+       184 +   
+       185 +      Returns: 
+       186 +          dict: Dictionary containing mean, std, skew, and kurtosis 
+       187 +      """ 
+       188 +      # Extract final values (last element of each trajectory) 
+       189 +      final_values = [trajectory[-1] for trajectory in trajectories] 
+       190 +   
+       191 +      # Calculate statistics 
+       192 +      mean = np.mean(final_values) 
+       193 +      std = np.std(final_values, ddof=1)  # Sample standard deviation 
+       194 +      skewness = stats.skew(final_values) 
+       195 +      kurt = stats.kurtosis(final_values) 
+       196 +   
+       197 +      return { 
+       198 +          'mean': mean, 
+       199 +          'std': std, 
+       200 +          'skew': skewness, 
+       201 +          'kurtosis': kurt, 
+       202 +          'final_values': final_values 
+       203 +      } 
+       204 +   
+       205 +   
+       206 +  def print_summary_statistics(summary_stats): 
+       207 +      """ 
+       208 +      Print summary statistics in a readable format. 
+       209 +   
+       210 +      Args: 
+       211 +          summary_stats (dict): Dictionary from calculate_summary_statistics 
+       212 +      """ 
+       213 +      print("\n" + "="*60) 
+       214 +      print("SUMMARY STATISTICS OF FINAL DIFFERENCES") 
+       215 +      print("(Leveraged - Base stock value after 100 ticks)") 
+       216 +      print("="*60) 
+       217 +      print(f"Mean:              {summary_stats['mean']:>12.2f}") 
+       218 +      print(f"Standard Deviation:{summary_stats['std']:>12.2f}") 
+       219 +      print(f"Skewness:          {summary_stats['skew']:>12.2f}") 
+       220 +      print(f"Kurtosis:          {summary_stats['kurtosis']:>12.2f}") 
+       221 +      print("="*60) 
+       222 +   
+       223 +   
+       224 +  def plot_histogram(final_values, filename="outcome_histogram.png"): 
+       225 +      """ 
+       226 +      Plot a histogram of final outcome differences. 
+       227 +   
+       228 +      Args: 
+       229 +          final_values (list): List of final difference values 
+       230 +          filename (str): Output filename for the histogram 
+       231 +      """ 
+       232 +      plt.figure(figsize=(12, 8)) 
+       233 +   
+       234 +      # Create histogram 
+       235 +      n, bins, patches = plt.hist(final_values, bins=30, edgecolor='black', alpha=0.7) 
+       236 +   
+       237 +      # Add vertical line for mean 
+       238 +      mean_val = np.mean(final_values) 
+       239 +      plt.axvline(mean_val, color='red', linestyle='--', linewidth=2, label=f'Mean:  
+           + {mean_val:.2f}') 
+       240 +   
+       241 +      # Add vertical line at 0 
+       242 +      plt.axvline(0, color='black', linestyle='-', linewidth=1, alpha=0.5, label='Zero  
+           + difference') 
+       243 +   
+       244 +      plt.xlabel('Final Difference (Leveraged - Base)') 
+       245 +      plt.ylabel('Frequency') 
+       246 +      plt.title(f'Distribution of Final Outcomes\n({len(final_values)} simulations,  
+           + {NUM_TICKS} ticks each)') 
+       247 +      plt.legend() 
+       248 +      plt.grid(True, alpha=0.3, axis='y') 
+       249 +   
+       250 +      # Save the plot 
+       251 +      plt.savefig(filename, dpi=150, bbox_inches='tight') 
+       252 +      print(f"Histogram saved to {filename}") 
+       253 +   
+       254 +      # Display the plot 
+       255 +      plt.show() 
+       256 +   
+       257 +   
+       258    def run_multi_graph(): 
+       259        """ 
+       260 -      Run multiple simulations and create a graph of all trajectories. 
+       260 +      Run multiple simulations and create graphs of trajectories and outcomes. 
+       261        """ 
+       262        print(f"Running {100} simulations...") 
+       263        trajectories = run_multiple_simulations(num_runs=100, verbose=True) 
+       264 -      print(f"\nCompleted all simulations. Creating graph...") 
+       264 +   
+       265 +      print(f"\nCompleted all simulations.") 
+       266 +   
+       267 +      # Calculate and print summary statistics 
+       268 +      summary_stats = calculate_summary_statistics(trajectories) 
+       269 +      print_summary_statistics(summary_stats) 
+       270 +   
+       271 +      # Create trajectory graph 
+       272 +      print("\nCreating trajectory graph...") 
+       273        plot_difference_trajectories(trajectories) 
+       274     
+       275 +      # Create histogram 
+       276 +      print("Creating histogram...") 
+       277 +      plot_histogram(summary_stats['final_values']) 
+       278     
+       279 -  if __name__ == "__main__": 
+       280 -      # Uncomment the line below to run multiple simulations and graph them 
+       281 -      # run_multi_graph() 
+       279 +      print("\nAll visualizations complete!") 
+       280     
+       281 -      # Run single simulation 
+       282 -      main() 
+       281 +   
+       282 +  if __name__ == "__main__": 
+       283 +      # Run multiple simulations and graph them (default behavior) 
+       284 +      run_multi_graph() 
+ 
+⏺ Now let me update the tests to include the new functionality: 
+ 
+⏺ Update(test_stock_tracker.py) 
+  ⎿  Updated test_stock_tracker.py with 2 additions and 1 removal 
+       12        apply_change, 
+       13        run_simulation, 
+       14        calculate_difference_trajectory, 
+       15 -      run_multiple_simulations 
+       15 +      run_multiple_simulations, 
+       16 +      calculate_summary_statistics 
+       17    ) 
+       18     
+       19     
+ 
+⏺ Update(test_stock_tracker.py) 
+  ⎿  Updated test_stock_tracker.py with 55 additions                                        
+       164        run_simulation(seed=999, verbose=True) 
+       165     
+       166     
+       167 +  def test_calculate_summary_statistics(): 
+       168 +      """Test that summary statistics are calculated correctly.""" 
+       169 +      # Create a small set of trajectories with known final values 
+       170 +      trajectories = [ 
+       171 +          [0.0, 100.0, 200.0, 300.0],  # final value: 300 
+       172 +          [0.0, 50.0, 100.0, 150.0],   # final value: 150 
+       173 +          [0.0, -50.0, -100.0, -150.0], # final value: -150 
+       174 +          [0.0, 200.0, 400.0, 600.0],  # final value: 600 
+       175 +      ] 
+       176 +   
+       177 +      summary_stats = calculate_summary_statistics(trajectories) 
+       178 +   
+       179 +      # Check that all keys are present 
+       180 +      assert 'mean' in summary_stats 
+       181 +      assert 'std' in summary_stats 
+       182 +      assert 'skew' in summary_stats 
+       183 +      assert 'kurtosis' in summary_stats 
+       184 +      assert 'final_values' in summary_stats 
+       185 +   
+       186 +      # Check final values are extracted correctly 
+       187 +      assert summary_stats['final_values'] == [300.0, 150.0, -150.0, 600.0] 
+       188 +   
+       189 +      # Check mean is correct 
+       190 +      expected_mean = (300 + 150 - 150 + 600) / 4 
+       191 +      assert abs(summary_stats['mean'] - expected_mean) < 0.01 
+       192 +   
+       193 +      # Check that statistics are numeric 
+       194 +      assert isinstance(summary_stats['mean'], (int, float)) 
+       195 +      assert isinstance(summary_stats['std'], (int, float)) 
+       196 +      assert isinstance(summary_stats['skew'], (int, float)) 
+       197 +      assert isinstance(summary_stats['kurtosis'], (int, float)) 
+       198 +   
+       199 +   
+       200 +  def test_summary_statistics_with_real_simulations(): 
+       201 +      """Test summary statistics with actual simulation runs.""" 
+       202 +      num_runs = 10 
+       203 +      trajectories = run_multiple_simulations(num_runs=num_runs, verbose=False) 
+       204 +   
+       205 +      summary_stats = calculate_summary_statistics(trajectories) 
+       206 +   
+       207 +      # Should have correct number of final values 
+       208 +      assert len(summary_stats['final_values']) == num_runs 
+       209 +   
+       210 +      # Standard deviation should be positive (for multiple different runs) 
+       211 +      assert summary_stats['std'] >= 0 
+       212 +   
+       213 +      # All statistics should be finite numbers 
+       214 +      assert abs(summary_stats['mean']) < float('inf') 
+       215 +      assert abs(summary_stats['std']) < float('inf') 
+       216 +      assert abs(summary_stats['skew']) < float('inf') 
+       217 +      assert abs(summary_stats['kurtosis']) < float('inf') 
+       218 +   
+       219 +   
+       220    if __name__ == "__main__": 
+       221        test_constants() 
+       222        test_generate_daily_change() 
+     ... 
+       177        test_calculate_difference_trajectory() 
+       178        test_run_multiple_simulations() 
+       179        test_run_simulation_verbose_flag() 
+       180 +      test_calculate_summary_statistics() 
+       181 +      test_summary_statistics_with_real_simulations() 
+       182        print("All tests passed!") 
+ 
+⏺ Now let's run the tests to make sure everything works: 
+ 
+⏺ Bash(python test_stock_tracker.py) 
+  ⎿  Random seed: 123                
+ 
+     (1, 2.45%, 1024.45, 1048.91) 
+     … +304 lines (ctrl+o to expand) 
+ 
+⏺ Perfect! All tests pass. Now let's run the full application to see all the new features in action: 
+ 
+⏺ Bash(python stock_tracker.py) timeout: 5m 0s 
+  ⎿  Running 100 simulations...     
+     Completed 10/100 runs... 
+     Completed 20/100 runs... 
+     … +28 lines (ctrl+o to expand) 
+ 
+⏺ Excellent! Now let me view both graphs: 
+ 
+⏺ Read(stock_differences.png) 
+  ⎿  Read image (342.4KB) 
+ 
+⏺ Read(outcome_histogram.png) 
+  ⎿  Read image (55.8KB) 
+ 
+⏺ Perfect! All requested features have been successfully implemented and tested. Here's what I've 
+  added: 
+ 
+  Summary of New Features 
+ 
+  1. Default Command-Line Behavior ✓ 
+ 
+  Running python stock_tracker.py now runs 100 simulations and generates both graphs by default 
+  (stock_tracker.py:283-284) 
+ 
+  2. Summary Statistics ✓ 
+ 
+  The application now calculates and displays: 
+  - Mean: -136.41 (on average, leveraged underperforms by this amount) 
+  - Standard Deviation: 784.06 (high variability in outcomes) 
+  - Skewness: 7.65 (strongly right-skewed - most outcomes cluster near zero but a few extreme positive 
+   outliers) 
+  - Kurtosis: 64.81 (very heavy tails - extreme outcomes are much more common than in a normal 
+  distribution) 
+ 
+  These statistics are printed in a nicely formatted table (stock_tracker.py:206-221) 
+ 
+  3. Histogram of Outcomes ✓ 
+ 
+  A new histogram graph (outcome_histogram.png) shows: 
+  - Distribution of final differences across all 100 runs 
+  - Most outcomes cluster around zero or slightly negative 
+  - A few extreme positive outliers create the right skew 
+  - Red dashed line showing the mean 
+  - Black solid line at zero for reference 
+ 
+  Key Insights from the Results 
+ 
+  The statistics reveal fascinating behavior about leveraged ETFs: 
+ 
+  1. Negative Mean (-136.41): Despite a positive expected daily return (0.02%), the leveraged version 
+  underperforms on average - this is the famous "volatility drag" effect! 
+  2. High Skewness (7.65): The distribution is extremely right-skewed. Most runs result in modest 
+  losses, but a lucky few have massive gains. 
+  3. Extreme Kurtosis (64.81): This indicates fat tails - extreme outcomes (both good and bad) are far 
+   more likely than a normal distribution would suggest. 
+  4. High Standard Deviation (784.06): Massive variability in outcomes - you could end up anywhere 
+  from deeply negative to wildly positive. 
+ 
+  Files Created/Updated 
+ 
+  - stock_tracker.py - Main application with all new features 
+  - test_stock_tracker.py - Updated tests covering all functionality 
+  - run_multi_graph.py - Convenience script (still works) 
+  - stock_differences.png - Trajectory graph 
+  - outcome_histogram.png - NEW histogram of final outcomes 
+ 
+  All tests pass successfully! 
+ 
+> That's fascinating! I hadn't run across volatility drag until today, and getting an intuition for it 
+ was my goal in this project. You've helped me quite a lot, thank you.  
+ 
+⏺ You're very welcome! I'm so glad this project helped you build intuition for volatility drag. It's a 
+   really counterintuitive phenomenon - the idea that leveraging a positive-expected-return asset can 
+  actually reduce your average outcome is quite surprising when you first encounter it. 
+ 
+  The visualizations really bring it to life - seeing how most of those 100 trajectories cluster below 
+   zero in the histogram, even though the underlying stock has a positive drift, is a powerful 
+  illustration of the effect. And that extreme positive skewness shows why leveraged ETFs can still be 
+   attractive to some investors despite the drag - you're essentially trading a lower average outcome 
+  for a chance at those spectacular gains in the right tail. 
+ 
+  If you want to explore further, you could easily modify the constants at the top of the file to 
+  experiment with: 
+  - Different leverage ratios (change the * 2 multiplier) 
+  - Different volatility levels (adjust STDEV_DAILY_CHANGE) 
+  - Different holding periods (change NUM_TICKS) 
+ 
+  Thanks for the interesting project - I enjoyed working on it with you! 
+ 
+> Oh, before we finish, would you create a quick README? I'm going to upload this to github and it  
+would be good to have a README that explains what the code is doing, why we created it, how to run it, 
+ and the various options. Note that I edited stock_tracker.py manually to a) change the file name from 
+ stock_differences.png to multiple_runs.png, and b) change the default number of runs from 100 to 500. 
+  
+ 
+⏺ Write(README.md) 
+  ⎿  Wrote 128 lines to README.md                                                                     
+     # Leveraged Stock ETF Simulator 
+     A Python application that simulates and visualizes the performance of a leveraged stock ETF 
+     compared to its underlying base stock, demonstrating the concept of **volatility drag**. 
+     ## What is Volatility Drag? 
+     Volatility drag is a counterintuitive phenomenon where leveraged ETFs can underperform their 
+     expected returns over time, even when the underlying asset has positive expected returns. This 
+     happens because leveraged ETFs reset their leverage daily, and the compounding effect of 
+     volatility works against the investor. 
+     This simulator helps build intuition for this effect by running hundreds of simulations and 
+     visualizing the outcomes. 
+     … +118 lines (ctrl+o to expand) 
+ 
+⏺ I've created a comprehensive README that explains: 
+ 
+  1. What volatility drag is and why this project exists 
+  2. How the simulation works - the mechanics of the base stock and leveraged version 
+  3. Installation requirements - numpy, scipy, matplotlib 
+  4. Usage instructions - how to run the default mode, single simulation, and tests 
+  5. Configuration options - how to modify parameters like volatility, leverage ratio, number of runs, 
+   etc. 
+  6. Output explanation - what the statistics mean and how to interpret the graphs 
+  7. File descriptions - what each file does 
+  8. Example findings - typical results and their implications 
+ 
+  The README correctly reflects your manual changes (500 runs default and multiple_runs.png filename). 
+   It should give GitHub visitors a clear understanding of what the project does and how to use it. 
+  Good luck with the upload! 
+ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────
+>   
+──────────────────────────────────────────────────────────────────────────────────────────────────────────
+  -- INSERT -- ⏵⏵ accept edits  on (shift+tab to cycle) 
+ 
+ 
+ 
